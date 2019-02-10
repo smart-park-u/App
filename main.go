@@ -1,9 +1,10 @@
 package main
 
 import (
-	"net/http"
 	"database/sql"
 	"fmt"
+	"net/http"
+	"os"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
 )
@@ -36,7 +37,7 @@ type ParkingSpot struct {
 func dbConn() (db *sql.DB) {
     dbDriver := "mysql"
     dbUser := "appuser"
-    dbPass := "password"
+    dbPass := os.Getenv("MYSQL_PASSWORD")
     dbName := "smartparkuDB"
     db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@/"+dbName)
     if err != nil {
