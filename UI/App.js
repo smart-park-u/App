@@ -8,7 +8,6 @@ import { Button, Image, View, Text, StyleSheet, ScrollView, FlatList, ActivityIn
 import { createStackNavigator, createAppContainer, createBottomTabNavigator } from 'react-navigation'; // Version can be specified in package.json
 import { Ionicons } from 'react-native-vector-icons/Ionicons';
 
-
 class HomeScreen extends React.Component {
   static navigationOptions = {
     title: 'Home',
@@ -53,50 +52,60 @@ class GreenHouseLot extends React.Component {
   static navigationOptions = {
     title: 'Greenhouse Lot',
   };
-constructor(props){
+  constructor(props){
     super(props);
-    this.state ={ isLoading: true}
-  }
-
-  componentDidMount(){
-    return fetch('http://18.222.24.171:12547/lots/greenhouse')
-      .then((response) => response.json())
-      .then((responseJson) => {
-
-        this.setState({
-          isLoading: false,
-          dataSource: responseJson,
-        }, function(){
-
-        });
-
-      })
-      .catch((error) =>{
-        console.error(error);
-      });
-  }
-
-
-
-  render(){
-
-    if(this.state.isLoading){
-      return(
-        <View style={{flex: 1, padding: 20}}>
-          <ActivityIndicator/>
-        </View>
-      )
+    messageVar = {
+              content: 'subscribe',
+              topic: 'greenhouse'
     }
+    dataSource = ''
+    
+    this.state ={ isLoading: true,
+                  dataSource: ''
+                }
+    this.ws = new WebSocket('ws://18.222.24.171:12547/ws');
+  }
+  
+  componentDidMount() {
 
-    return(
-      <View style={{flex: 1, paddingTop:20}}>
-        <Text>E: {this.state.dataSource.E}</Text>
-        <Text>F: {this.state.dataSource.F}</Text>
-        <Text>SB: {this.state.dataSource.SB}</Text>
-        <Text>R: {this.state.dataSource.R}</Text>
-        <Text>Handicapped: {this.state.dataSource.Handicap}</Text>
+  this.ws.onopen = () => {
+  // connection opened
+  this.ws.send(JSON.stringify(messageVar)); // send a message
+  };
+
+  this.ws.onmessage = (e) => {
+    // a message was received
+    console.log(e.data);
+	this.setState({
+	    dataSource: JSON.parse(e.data)
+	})
+	console.log("DataSRC = ", this.state.dataSource)
+	
+  };
+
+  this.ws.onerror = (e) => {
+    // an error occurred
+    console.log(e.message);
+  };
+
+  this.ws.onclose = (e) => {
+    // connection closed
+    console.log(e.code, e.reason);
+  };
+
+  }
+  render () {
+    return (
+      <View style={{flex: 1}}>
+        <Text>Total Open: {this.state.dataSource.content}</Text>
+        <Text></Text>
+        <ScrollView maximumZoomScale={2.5} minimumZoomScale={.38}
+         contentContainerStyle={styles.scroll}>
+          <Image style={styles.image} source={require('./GreenhouseLot.png')} />
+        </ScrollView>
       </View>
-    );
+     
+    )
   }
 }
 
@@ -106,46 +115,57 @@ class GattonLot extends React.Component {
   };
   constructor(props){
     super(props);
-    this.state ={ isLoading: true}
+    messageVar = {
+              content: 'subscribe',
+              topic: 'gatton'
+    }
+    dataSource = ''
+    
+    this.state ={ isLoading: true,
+                  dataSource: ''
+                }
+    this.ws = new WebSocket('ws://18.222.24.171:12547/ws');
   }
+  
+  componentDidMount() {
 
-  componentDidMount(){
-    return fetch('http://18.222.24.171:12547/lots/south-gatton')
-      .then((response) => response.json())
-      .then((responseJson) => {
+  this.ws.onopen = () => {
+  // connection opened
+  this.ws.send(JSON.stringify(messageVar)); // send a message
+  };
 
-        this.setState({
-          isLoading: false,
-          dataSource: responseJson,
-        }, function(){
+  this.ws.onmessage = (e) => {
+    // a message was received
+    console.log(e.data);
+	this.setState({
+	    dataSource: JSON.parse(e.data)
+	})
+	console.log("DataSRC = ", this.state.dataSource)
+	
+  };
 
-        });
+  this.ws.onerror = (e) => {
+    // an error occurred
+    console.log(e.message);
+  };
 
-      })
-      .catch((error) =>{
-        console.error(error);
-      });
+  this.ws.onclose = (e) => {
+    // connection closed
+    console.log(e.code, e.reason);
+  };
+
   }
-
-
-
   render(){
 
-    if(this.state.isLoading){
-      return(
-        <View style={{flex: 1, padding: 20}}>
-          <ActivityIndicator/>
-        </View>
-      )
-    }
 
-    return(
-      <View style={{flex: 1, paddingTop:20}}>
-        <Text>E: {this.state.dataSource.E}</Text>
-        <Text>F: {this.state.dataSource.F}</Text>
-        <Text>SB: {this.state.dataSource.SB}</Text>
-        <Text>R: {this.state.dataSource.R}</Text>
-        <Text>Handicapped: {this.state.dataSource.Handicap}</Text>
+    return (
+      <View style={{flex: 1}}>
+        <Text>Total Open: {this.state.dataSource.content}</Text>
+        <Text></Text>
+        <ScrollView maximumZoomScale={2.5} minimumZoomScale={.38}
+         contentContainerStyle={styles.scroll}>
+          <Image style={styles.image} source={require('./GattonLot.png')} />
+        </ScrollView>
       </View>
     );
   }
@@ -157,46 +177,56 @@ class LinfieldLot extends React.Component {
   };
   constructor(props){
     super(props);
-    this.state ={ isLoading: true}
+    messageVar = {
+              content: 'subscribe',
+              topic: 'linhfield'
+    }
+    dataSource = ''
+    
+    this.state ={ isLoading: true,
+                  dataSource: ''
+                }
+    this.ws = new WebSocket('ws://18.222.24.171:12547/ws');
   }
+  
+  componentDidMount() {
 
-  componentDidMount(){
-    return fetch('http://18.222.24.171:12547/lots/west-linhfield')
-      .then((response) => response.json())
-      .then((responseJson) => {
+  this.ws.onopen = () => {
+  // connection opened
+  this.ws.send(JSON.stringify(messageVar)); // send a message
+  };
 
-        this.setState({
-          isLoading: false,
-          dataSource: responseJson,
-        }, function(){
+  this.ws.onmessage = (e) => {
+    // a message was received
+    console.log(e.data);
+	this.setState({
+	    dataSource: JSON.parse(e.data)
+	})
+	console.log("DataSRC = ", this.state.dataSource)
+	
+  };
 
-        });
+  this.ws.onerror = (e) => {
+    // an error occurred
+    console.log(e.message);
+  };
 
-      })
-      .catch((error) =>{
-        console.error(error);
-      });
+  this.ws.onclose = (e) => {
+    // connection closed
+    console.log(e.code, e.reason);
+  };
+
   }
-
-
-
   render(){
 
-    if(this.state.isLoading){
-      return(
-        <View style={{flex: 1, padding: 20}}>
-          <ActivityIndicator/>
-        </View>
-      )
-    }
-
-    return(
-      <View style={{flex: 1, paddingTop:20}}>
-        <Text>E: {this.state.dataSource.E}</Text>
-        <Text>F: {this.state.dataSource.F}</Text>
-        <Text>SB: {this.state.dataSource.SB}</Text>
-        <Text>R: {this.state.dataSource.R}</Text>
-        <Text>Handicapped: {this.state.dataSource.Handicap}</Text>
+    return (
+      <View style={{flex: 1}}>
+        <Text>Total Open: {this.state.dataSource.content}</Text>
+        <Text></Text>
+        <ScrollView maximumZoomScale={2.5} minimumZoomScale={.38}
+         contentContainerStyle={styles.scroll}>
+          <Image style={styles.image} source={require('./LinhfieldLot.png')} />
+        </ScrollView>
       </View>
     );
   }
