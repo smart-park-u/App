@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/labstack/echo"
 	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/websocket"
 )
@@ -17,15 +18,15 @@ var (
 	gRedisConn  = func() (redis.Conn, error) {
 		return redis.Dial("tcp", ":6379")
 	}
-    upgrader = websocket.Upgrader{}
+	upgrader = websocket.Upgrader{}
 )
-
+/*
 func init() {
 	gStore = &Store{
 		Users: make([]*User, 0, 1),
 	}
 }
-
+*/
 // User holds a websocket connection and a subscription topic
 type User struct {
 	Topic string
@@ -52,13 +53,13 @@ func (c *Core) newUser(conn *websocket.Conn) *User {
 		conn:  conn,
 	}
 
-	c.ClientStore.Lock()
-	defer c.ClientStore.Unlock()
+	c.gStore.Lock()
+	defer c.gStore.Unlock()
 
-	s.Users = append(s.Users, u)
+	c.gStore.Users = append(c.gStore.Users, u)
 	return u
 }
-
+/*
 func main() {
 	gRedisConn, err := gRedisConn()
 	if err != nil {
@@ -74,9 +75,10 @@ func main() {
     }
 	defer gPubSubConn.Close()
 }
-
-func (c *Core) wsHandler(ctx echo.Context) {
-	conn, err := c.upgrader.Upgrade(ctx.Response(), ctx.Request(), nil)
+*/
+func (c *Core) wsHandler(ctx echo.Context) error {
+	c.Upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+	conn, err := c.Upgrader.Upgrade(ctx.Response(), ctx.Request(), nil)
 	if err != nil {
 		log.Printf("upgrader error %s\n" + err.Error())
 		return err
@@ -91,23 +93,23 @@ func (c *Core) wsHandler(ctx echo.Context) {
 			log.Printf("error on ws. message %s\n", err)
 		}
 
-        if m.Content == "subscribe" {
-            u.Topic = m.Topic
-        } else {
-		    if c, err := gRedisConn(); err != nil {
-                log.Printf("error on redis conn. %s\n", err)
-		    } else {
-                c.Do("PUBLISH", m.Topic, string(m.Content))
-		    }
-        }
+		if m.Content == "subscribe" {
+			u.Topic = m.Topic
+		} else {
+			if c, err := gRedisConn(); err != nil {
+				log.Printf("error on redis conn. %s\n", err)
+			} else {
+				c.Do("PUBLISH", m.Topic, string(m.Content))
+			}
+		}
 	}
 }
 
-func deliverMessages() {
+func (c *Core) deliverMessages() {
 	for {
-		switch v := gPubSubConn.Receive().(type) {
+		switch v := c.gPubSubConn.Receive().(type) {
 		case redis.Message:
-			gStore.findAndDeliver(v.Channel, string(v.Data))
+			c.gStore.findAndDeliver(v.Channel, string(v.Data))
 		case redis.Subscription:
 			log.Printf("subscription message: %s: %s %d\n", v.Channel, v.Kind, v.Count)
 		case error:
@@ -119,7 +121,7 @@ func deliverMessages() {
 
 func (s *Store) findAndDeliver(topic string, content string) {
 	m := Message{
-        Topic:   topic,
+		Topic:   topic,
 		Content: content,
 	}
 	for _, u := range s.Users {
