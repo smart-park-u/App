@@ -5,22 +5,59 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/gomodule/redigo/redis"
+	"github.com/gorilla/websocket"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
 )
 
 type Core struct {
-	DB *sql.DB
+    ClientStore *Store
+	DB          *sql.DB
+    Lots        []string
+    PubSubConn  *redis.PubSubConn
+    RedisConn   func() (redis.Conn, error)
+    Upgrader    websocket.Upgrader
+}
+
+type lotUpdate struct {
+    LotName       string `json:"lotName"`
+    SpotsOccupied int    `json:"spotsOccupied"`
+}
+
+type lotUpdates struct {
+    Updates []lotUpdate `json:"lotUpdates"`
 }
 
 func main() {
 	c := &Core{
+        ClientStore: &Store{
+            Users: make([]*User, 0, 1),
+        },
 		DB: dbConn(),
+        Lots: []string{"west_linhfield", "south_gatton", "greenhouse"},
+        RedisConn: func() (redis.Conn, error) {
+            return redis.Dial("tcp", ":6379")
+        },
+        Upgrader: websocket.Upgrader{},
 	}
+
+    redisConn, err := c.getRedisConn()
+    if err != nil {
+        panic(err)
+    }
+    defer redisConn.Close()
+
+    c.PubSubConn = &redis.PubSubConn{Conn: redisConn}
+    defer c.PubSubConn.Close()
+
+	go deliverMessages()
 
 	e := echo.New()
 	e.GET("/lots/:lot", c.getLotInfo)
-	e.PUT("/spots/:spotOccupied", c.updateSpot)
+    e.GET("/ws", c.wsHandler)
+    e.POST("/update-lots", c.updateLots)
 	e.Logger.Fatal(e.Start(":12547"))
 	defer c.DB.Close()
 }
@@ -62,6 +99,34 @@ func (c *Core) getLotInfo(ctx echo.Context) error {
 	resp := map[string]int{"F": openF, "E": openE, "R": openR, "SB": openSB, "Handicap": openHandicap}
 	return ctx.JSON(http.StatusOK, resp)
 }
+
+func (c *Core) updateLots(ctx echo.Context) error {
+    response := map[string]string{}
+    payload := new(lotUpdates)
+    if err := ctx.Bind(payload); err != nil {
+        response["status"] = fmt.Sprintf("bad arguments: %s", err)
+        return ctx.JSON(http.StatusBadRequest, response)
+    }
+
+    //build the query string
+    batchQuery := ""
+    for _, update := range payload.Updates {
+        batchQuery += fmt.Sprintf("UPDATE parking_lot SET is_occupied = 0 WHERE lot_name = %s; ", update.LotName)
+        batchQuery += fmt.Sprintf("UPDATE parking_lot SET is_occupied = 1 WHERE lot_name = %s ORDER BY is_occupied DESC LIMIT %d; ", update.LotName, update.SpotsOccupied)
+        // need to put all the queries together to only make one db connection.
+        /*if x < len (batch)
+            batchQuery += "; "
+        else
+            break
+        */
+    }
+    updForm, err:= c.DB.Prepare(batchQuery)
+    if err != nil{
+        panic(err.Error())
+    }
+    updForm.Exec(batchQuery)
+}
+
 
 //Method used to update a specific spot to whether it's occupied or not.
 func (c *Core) updateSpot(ctx echo.Context) error {
