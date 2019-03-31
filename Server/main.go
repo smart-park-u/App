@@ -83,18 +83,23 @@ func dbConn() (db *sql.DB) {
 
 //Method that returns every parking spot type and the number of available spots for each type in the requested lot that the user clicks on in their application.
 func (c *Core) getLotInfo(ctx echo.Context) error {
+	fmt.Println("received request to getLotInfo")
 	lot := ctx.Param("lot")
-	inqForm, err := c.DB.Query(fmt.Sprintf("SELECT COUNT(CASE WHEN lot_name = '%s' && is_occupied = 0 && spot_type = 'F' THEN 1 END) as openF, COUNT(CASE WHEN lot_name = '%s' && is_occupied = 0 && spot_type = 'E' THEN 1 END) as openE, COUNT(CASE WHEN lot_name = '%s' && is_occupied = 0 && spot_type = 'R' THEN 1 END) as openR, COUNT(CASE WHEN lot_name = '%s' && is_occupied = 0 && spot_type = 'SB' THEN 1 END) as openSB, COUNT(CASE WHEN lot_name = '%s' && is_occupied = 0 && spot_type = 'Handicap' THEN 1 END) as openHandicap FROM parking_lot;", lot, lot, lot, lot, lot))
+	//inqForm, err := c.DB.Query(fmt.Sprintf("SELECT COUNT(CASE WHEN lot_name = '%s' && is_occupied = 0 && spot_type = 'F' THEN 1 END) as openF, COUNT(CASE WHEN lot_name = '%s' && is_occupied = 0 && spot_type = 'E' THEN 1 END) as openE, COUNT(CASE WHEN lot_name = '%s' && is_occupied = 0 && spot_type = 'R' THEN 1 END) as openR, COUNT(CASE WHEN lot_name = '%s' && is_occupied = 0 && spot_type = 'SB' THEN 1 END) as openSB, COUNT(CASE WHEN lot_name = '%s' && is_occupied = 0 && spot_type = 'Handicap' THEN 1 END) as openHandicap FROM parking_lot;", lot, lot, lot, lot, lot))
+	inqForm, err := c.DB.Query(fmt.Sprintf("SELECT COUNT(CASE WHEN lot_name = '%s' && is_occupied = 0 THEN 1 END) as open FROM parking_lot;", lot))
 	if err != nil{
+		fmt.Println(err)
 		panic(err.Error())
 	}
-	var openF, openE, openR, openSB, openHandicap int
+	//var openF, openE, openR, openSB, openHandicap int
+	var open int
 	inqForm.Next()
-	if err := inqForm.Scan(&openF, &openE, &openR, &openSB, &openHandicap); err != nil{
+	if err := inqForm.Scan(&open); err != nil{
 		fmt.Println(err)
 	}
 	//formats the response string for the application to be able to parse and use on screen.
-	resp := map[string]int{"F": openF, "E": openE, "R": openR, "SB": openSB, "Handicap": openHandicap}
+	//resp := map[string]int{"F": openF, "E": openE, "R": openR, "SB": openSB, "Handicap": openHandicap}
+	resp := map[string]int{"total": open}
 	return ctx.JSON(http.StatusOK, resp)
 }
 
@@ -107,48 +112,21 @@ func (c *Core) updateLots(ctx echo.Context) error {
 	}
 
 	//build the query string
-	batchQuery := ""
 	for _, update := range payload.Updates {
-		batchQuery += fmt.Sprintf("UPDATE parking_lot SET is_occupied = 0 WHERE lot_name = %s; ", update.LotName)
-		batchQuery += fmt.Sprintf("UPDATE parking_lot SET is_occupied = 1 WHERE lot_name = %s ORDER BY is_occupied DESC LIMIT %d; ", update.LotName, update.SpotsOccupied)
-		// need to put all the queries together to only make one db connection.
-		/*if x < len (batch)
-			batchQuery += "; "
-		else
-			break
-		*/
+		resetQuery := fmt.Sprintf("UPDATE parking_lot SET is_occupied = 0 WHERE lot_name = '%s'; ", update.LotName)
+		updForm, err := c.DB.Prepare(resetQuery)
+		if err != nil {
+			panic(err.Error())
+		}
+		updForm.Exec(resetQuery)
+
+		updateQuery := fmt.Sprintf("UPDATE parking_lot SET is_occupied = 1 WHERE lot_name = '%s' ORDER BY spot_id ASC LIMIT %d; ", update.LotName, update.SpotsOccupied)
+		updForm, err = c.DB.Prepare(updateQuery)
+		if err != nil {
+			panic(err.Error())
+		}
+		updForm.Exec(updateQuery)
 	}
-	updForm, err:= c.DB.Prepare(batchQuery)
-	if err != nil{
-		panic(err.Error())
-	}
-	updForm.Exec(batchQuery)
 
 	return ctx.String(http.StatusOK, "ok")
 }
-
-/*
-//Method used to update a specific spot to whether it's occupied or not.
-func (c *Core) updateSpot(ctx echo.Context) error {
-	spotOccupied := ctx.Param("spotOccupied")
-	spotID := ctx.Body("spotID")
-	location := ctx.Body("location")
-	lotName := ctx.Body("lotName")
-	if spotOccupied == "1"{
-		updForm, err := c.DB.Prepare("UPDATE parking_lot SET is_occupied = 1 WHERE spot_id = ? && lot_name = ? && location = ?")
-		if err != nil {
-			panic(err.Error())
-		}
-	}
-	if spotOccupied == "0"{
-		updForm, err := c.DB.Prepare("UPDATE parking_lot SET is_occupied = 0 WHERE spot_id = ? && lot_name = ? && location = ?")
-		if err != nil {
-			panic(err.Error())
-		}
-	}
-
-				updForm.Exec(spotID, lotName, location)
-		resp :=  spotID + " has been updated in " + lotName + " lot on the following campus: " + location
-	return ctx.String(http.StatusOK, resp)
-}
-*/
