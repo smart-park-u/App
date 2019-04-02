@@ -20,16 +20,16 @@ class HomeScreen extends React.Component {
      <ScrollView style={{paddingTop: 10}}>
       <View> 
         <Button
-          title="6) Greenhouse Lot"
+          title="Greenhouse Lot"
           onPress={() => this.props.navigation.navigate('GreenHouse')}
         />
         <Button
-          title="7) West Linhfield Lot"
+          title="West Linhfield Lot"
           onPress={() => this.props.navigation.navigate('Linhfield')}
         />
         
         <Button
-          title="11) South Gatton Lot"
+          title="South Gatton Lot"
           onPress={() => this.props.navigation.navigate('Gatton')}
         />
       </View>
@@ -94,7 +94,7 @@ class GreenHouseLot extends React.Component {
     // a message was received
     console.log(e.data);
 	this.setState({
-	    dataSource: JSON.parse(e.data)
+	    dataSource: JSON.parse(JSON.parse(e.data).content)
 	})
 	console.log("DataSRC = ", this.state.dataSource)
 	
@@ -143,7 +143,7 @@ class GattonLot extends React.Component {
     super(props);
     messageVar = {
               content: 'subscribe',
-              topic: 'gatton'
+              topic: 'south-gatton'
     }
     
     this.state ={ isLoading: true,
@@ -179,7 +179,7 @@ class GattonLot extends React.Component {
     // a message was received
     console.log(e.data);
 	this.setState({
-	    dataSource: JSON.parse(e.data)
+	    dataSource: JSON.parse(JSON.parse(e.data).content)
 	})
 	console.log("DataSRC = ", this.state.dataSource)
 	
@@ -262,7 +262,7 @@ class LinhfieldLot extends React.Component {
     // a message was received
     console.log(e.data);
 	this.setState({
-	    dataSource: JSON.parse(e.data)
+	    dataSource: JSON.parse(JSON.parse(e.data).content)
 	})
 	console.log("DataSRC = ", this.state.dataSource)
 	
