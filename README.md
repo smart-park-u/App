@@ -1,4 +1,4 @@
-# App
+# SmartParkU App
 Purpose of this project is to display parking lot status via image recognition and object localization powered by YOLO. 
 	- Languages used: GO, JavaScript, and Bash
 	
