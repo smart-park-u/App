@@ -6,7 +6,10 @@ GreenHouse Lot
 import React from 'react';
 import { Button, Image, View, Text, StyleSheet, ScrollView, FlatList, ActivityIndicator} from 'react-native';
 import { createStackNavigator, createAppContainer, createBottomTabNavigator } from 'react-navigation'; // Version can be specified in package.json
-import { Ionicons } from 'react-native-vector-icons/Ionicons';
+import { Icon } from 'react-native-elements';
+
+const serverAddress = "18.222.24.171"
+const serverPort = "12547"
 
 class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -21,8 +24,8 @@ class HomeScreen extends React.Component {
           onPress={() => this.props.navigation.navigate('GreenHouse')}
         />
         <Button
-          title="7) West Linfield Lot"
-          onPress={() => this.props.navigation.navigate('Linfield')}
+          title="7) West Linhfield Lot"
+          onPress={() => this.props.navigation.navigate('Linhfield')}
         />
         
         <Button
@@ -58,19 +61,33 @@ class GreenHouseLot extends React.Component {
               content: 'subscribe',
               topic: 'greenhouse'
     }
-    dataSource = ''
     
     this.state ={ isLoading: true,
                   dataSource: ''
                 }
-    this.ws = new WebSocket('ws://18.222.24.171:12547/ws');
+    this.ws = new WebSocket("ws://" +serverAddress +":" +serverPort +"/ws");
   }
   
   componentDidMount() {
+   fetch("http://" +serverAddress +":" +serverPort +"/lots/greenhouse")
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState({
+          isLoading: false,
+          dataSource: responseJson,
+        }, function(){
 
+        });        
+
+      })
+      .catch((error) =>{
+        console.error(error);
+      });
+      
   this.ws.onopen = () => {
-  // connection opened
-  this.ws.send(JSON.stringify(messageVar)); // send a message
+    this.ws.send(JSON.stringify(messageVar)); // send a message
+    
+  
   };
 
   this.ws.onmessage = (e) => {
@@ -90,14 +107,23 @@ class GreenHouseLot extends React.Component {
 
   this.ws.onclose = (e) => {
     // connection closed
+    this.ws.close();
     console.log(e.code, e.reason);
   };
 
   }
   render () {
+    if(this.state.isLoading){
+      return(
+        <View style={{flex: 1, padding: 20}}>
+          <ActivityIndicator/>
+        </View>
+      )
+    }
+    
     return (
       <View style={{flex: 1}}>
-        <Text>Total Open: {this.state.dataSource.content}</Text>
+        <Text>Total Open: {this.state.dataSource.total}</Text>
         <Text></Text>
         <ScrollView maximumZoomScale={2.5} minimumZoomScale={.38}
          contentContainerStyle={styles.scroll}>
@@ -119,19 +145,34 @@ class GattonLot extends React.Component {
               content: 'subscribe',
               topic: 'gatton'
     }
-    dataSource = ''
     
     this.state ={ isLoading: true,
                   dataSource: ''
                 }
-    this.ws = new WebSocket('ws://18.222.24.171:12547/ws');
+    this.ws = new WebSocket("ws://" +serverAddress +":" +serverPort +"/ws");
   }
   
   componentDidMount() {
+    fetch("http://" +serverAddress +":" +serverPort +"/lots/south-gatton")
+      .then((response) => response.json())
+      .then((responseJson) => {
+
+        this.setState({
+          isLoading: false,
+          dataSource: responseJson,
+        }, function(){
+
+        });        
+
+      })
+      .catch((error) =>{
+        console.error(error);
+      });
 
   this.ws.onopen = () => {
   // connection opened
   this.ws.send(JSON.stringify(messageVar)); // send a message
+  
   };
 
   this.ws.onmessage = (e) => {
@@ -151,16 +192,24 @@ class GattonLot extends React.Component {
 
   this.ws.onclose = (e) => {
     // connection closed
+    this.ws.close();
     console.log(e.code, e.reason);
   };
 
   }
   render(){
+    if(this.state.isLoading){
+      return(
+        <View style={{flex: 1, padding: 20}}>
+          <ActivityIndicator/>
+        </View>
+      )
+    }
 
 
     return (
       <View style={{flex: 1}}>
-        <Text>Total Open: {this.state.dataSource.content}</Text>
+        <Text>Total Open: {this.state.dataSource.total}</Text>
         <Text></Text>
         <ScrollView maximumZoomScale={2.5} minimumZoomScale={.38}
          contentContainerStyle={styles.scroll}>
@@ -171,7 +220,7 @@ class GattonLot extends React.Component {
   }
 }
 
-class LinfieldLot extends React.Component {
+class LinhfieldLot extends React.Component {
   static navigationOptions = {
     title: 'West Linhfield Lot',
   };
@@ -179,21 +228,34 @@ class LinfieldLot extends React.Component {
     super(props);
     messageVar = {
               content: 'subscribe',
-              topic: 'linhfield'
+              topic: 'west-linhfield'
     }
-    dataSource = ''
     
     this.state ={ isLoading: true,
                   dataSource: ''
                 }
-    this.ws = new WebSocket('ws://18.222.24.171:12547/ws');
+    this.ws = new WebSocket("ws://" +serverAddress +":" +serverPort +"/ws");
   }
   
   componentDidMount() {
+    fetch("http://" +serverAddress +":" +serverPort +"/lots/west-linhfield")
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState({
+          isLoading: false,
+          dataSource: responseJson,
+        }, function(){
 
+        });        
+
+      })
+      .catch((error) =>{
+        console.error(error);
+      });
   this.ws.onopen = () => {
   // connection opened
   this.ws.send(JSON.stringify(messageVar)); // send a message
+    
   };
 
   this.ws.onmessage = (e) => {
@@ -213,15 +275,23 @@ class LinfieldLot extends React.Component {
 
   this.ws.onclose = (e) => {
     // connection closed
+    this.ws.close();
     console.log(e.code, e.reason);
   };
 
   }
   render(){
-
+     if(this.state.isLoading){
+      return(
+        <View style={{flex: 1, padding: 20}}>
+          <ActivityIndicator/>
+        </View>
+      )
+    }
+//
     return (
       <View style={{flex: 1}}>
-        <Text>Total Open: {this.state.dataSource.content}</Text>
+        <Text>Total Open: {this.state.dataSource.total}</Text>
         <Text></Text>
         <ScrollView maximumZoomScale={2.5} minimumZoomScale={.38}
          contentContainerStyle={styles.scroll}>
@@ -253,7 +323,7 @@ const RootStack = createStackNavigator(
   {
     Home: HomeScreen,
     Gatton: GattonLot,
-    Linfield: LinfieldLot,
+    Linhfield: LinhfieldLot,
     GreenHouse: GreenHouseLot,
     
   },
@@ -264,8 +334,16 @@ const RootStack = createStackNavigator(
 
 const TabNavigator = createBottomTabNavigator(
   {
-    Home: { screen: RootStack },
-    Map: { screen: MapScreen },
+    Home: { screen: RootStack, 
+            navigationOptions: {
+              tabBarIcon: ({tintColor}) => <Icon name="home" type="Ionicon" size={28} color={tintColor} />
+            },
+          },
+    Map: { screen: MapScreen,
+           navigationOptions: {
+              tabBarIcon: ({ tintColor }) => <Icon name="map" type="Ionicon" size={28} color={tintColor} />         
+           },
+     },
   },
 );
 
