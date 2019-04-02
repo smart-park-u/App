@@ -115,19 +115,10 @@ func (c *Core) updateLots(ctx echo.Context) error {
 	for _, update := range payload.Updates {
 		//Query formatted here, no need for Prepare statement.
 		resetQuery := fmt.Sprintf("UPDATE parking_lot SET is_occupied = 0 WHERE lot_name = '%s'; ", update.LotName)
-		/*updForm, err := c.DB.Prepare(resetQuery)
-		if err != nil {
-			panic(err.Error())
-		}*/
-		//fmt.Println("Clearing lot: ", updForm)
 		c.DB.Query(resetQuery)
 
 		//Query is already formatted.... no need for Prepare statement
 		updateQuery := fmt.Sprintf("UPDATE parking_lot SET is_occupied = 1 WHERE lot_name = '%s' ORDER BY spot_id ASC LIMIT %d; ", update.LotName, update.SpotsOccupied)
-		/*updForm, err = c.DB.Prepare(updateQuery)
-		if err != nil {
-			panic(err.Error())
-		}*/
 		//fmt.Println("Updating lot: ", updForm)
 		c.DB.Query(updateQuery)
 
