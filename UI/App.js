@@ -4,9 +4,10 @@ West Linfield Lot
 GreenHouse Lot
 */
 import React from 'react';
-import { Button, Image, View, Text, StyleSheet, ScrollView, FlatList, ActivityIndicator} from 'react-native';
+import { Button, Image, View, Text, StyleSheet, ScrollView, FlatList, ActivityIndicator,} from 'react-native';
 import { createStackNavigator, createAppContainer, createBottomTabNavigator } from 'react-navigation'; // Version can be specified in package.json
 import { Icon } from 'react-native-elements';
+import { Font } from 'expo';
 
 const serverAddress = "18.222.24.171"
 const serverPort = "12547"
@@ -27,10 +28,105 @@ class HomeScreen extends React.Component {
           title="West Linhfield Lot"
           onPress={() => this.props.navigation.navigate('Linhfield')}
         />
-        
         <Button
           title="South Gatton Lot"
           onPress={() => this.props.navigation.navigate('Gatton')}
+        />
+        <Button
+          title="North Hedges Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Roskie Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="South Hedges Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="South 12th Street Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Deer Street Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Langford Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Lewis and Clark Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Parking Garage"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Faculty Court"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Huffman Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="North Fieldhouse Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="South Fieldhouse Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Hamilton Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Roberts Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Antelope Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="East Linfield Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="West Stadium Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Lincoln Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Quads Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Harrison Street Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="S. 7th Reserved Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Stadium East Lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Bison lot"
+          onPress={() => this.props.navigation.navigate('')}
+        />
+        <Button
+          title="Yellowstone Lot"
+          onPress={() => this.props.navigation.navigate('')}
         />
       </View>
      </ScrollView>
@@ -69,6 +165,7 @@ class GreenHouseLot extends React.Component {
   }
   
   componentDidMount() {
+  
    fetch("http://" +serverAddress +":" +serverPort +"/lots/greenhouse")
       .then((response) => response.json())
       .then((responseJson) => {
@@ -110,9 +207,10 @@ class GreenHouseLot extends React.Component {
     this.ws.close();
     console.log(e.code, e.reason);
   };
-
+  
   }
   render () {
+  
     if(this.state.isLoading){
       return(
         <View style={{flex: 1, padding: 20}}>
@@ -120,15 +218,12 @@ class GreenHouseLot extends React.Component {
         </View>
       )
     }
-    
+
     return (
-      <View style={{flex: 1}}>
-        <Text>Total Open: {this.state.dataSource.total}</Text>
+      <View style={styles.lotStyle}>
+        <Text style={styles.lotText}>Total Open: {this.state.dataSource.total}</Text>
         <Text></Text>
-        <ScrollView maximumZoomScale={2.5} minimumZoomScale={.38}
-         contentContainerStyle={styles.scroll}>
-          <Image style={styles.image} source={require('./GreenhouseLot.png')} />
-        </ScrollView>
+          <Image style={styles.lotImage} source={require('./GreenhouseLot.png')} />
       </View>
      
     )
@@ -143,7 +238,7 @@ class GattonLot extends React.Component {
     super(props);
     messageVar = {
               content: 'subscribe',
-              topic: 'south-gatton'
+              topic: 'gatton'
     }
     
     this.state ={ isLoading: true,
@@ -197,24 +292,21 @@ class GattonLot extends React.Component {
   };
 
   }
+  
   render(){
+  
     if(this.state.isLoading){
       return(
         <View style={{flex: 1, padding: 20}}>
           <ActivityIndicator/>
         </View>
-      )
+      );
     }
-
-
     return (
-      <View style={{flex: 1}}>
-        <Text>Total Open: {this.state.dataSource.total}</Text>
+      <View style={styles.lotStyle}>
+        <Text style={styles.lotText}>Total Open: {this.state.dataSource.total}</Text>
         <Text></Text>
-        <ScrollView maximumZoomScale={2.5} minimumZoomScale={.38}
-         contentContainerStyle={styles.scroll}>
-          <Image style={styles.image} source={require('./GattonLot.png')} />
-        </ScrollView>
+          <Image style={styles.lotImage} source={require('./GattonLot.png')} />
       </View>
     );
   }
@@ -238,6 +330,7 @@ class LinhfieldLot extends React.Component {
   }
   
   componentDidMount() {
+  
     fetch("http://" +serverAddress +":" +serverPort +"/lots/west-linhfield")
       .then((response) => response.json())
       .then((responseJson) => {
@@ -252,6 +345,7 @@ class LinhfieldLot extends React.Component {
       .catch((error) =>{
         console.error(error);
       });
+   
   this.ws.onopen = () => {
   // connection opened
   this.ws.send(JSON.stringify(messageVar)); // send a message
@@ -280,37 +374,44 @@ class LinhfieldLot extends React.Component {
   };
 
   }
+  
   render(){
+  
      if(this.state.isLoading){
       return(
         <View style={{flex: 1, padding: 20}}>
           <ActivityIndicator/>
         </View>
-      )
+      );
     }
-//
     return (
-      <View style={{flex: 1}}>
-        <Text>Total Open: {this.state.dataSource.total}</Text>
+      <View style={styles.lotStyle}>
+        <Text style={styles.lotText}>Total Open: {this.state.dataSource.total}</Text>
         <Text></Text>
-        <ScrollView maximumZoomScale={2.5} minimumZoomScale={.38}
-         contentContainerStyle={styles.scroll}>
-          <Image style={styles.image} source={require('./LinhfieldLot.png')} />
-        </ScrollView>
+          <Image style={styles.lotImage} source={require('./LinhfieldLot.png')} />
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  lotStyle: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   lotText: {
-    color: 'blue',
+    color: 'black',
     fontWeight: 'bold',
-    fontSize: 100,
+    fontSize: 36,
   },
   image: {
     height: 1000,
     width: 1000,
+    resizeMode: 'contain',
+  },
+  lotImage: {
+    height: 450,
+    width: 350,
     resizeMode: 'contain',
   },
   scroll: {
@@ -352,6 +453,8 @@ const AppContainer = createAppContainer(TabNavigator);
 export default class App extends React.Component {
   
   render() {
-    return <AppContainer />;
+       return <AppContainer/>
   }
 }
+
+
