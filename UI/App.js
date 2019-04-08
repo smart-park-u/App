@@ -4,20 +4,67 @@ West Linfield Lot
 GreenHouse Lot
 */
 import React from 'react';
-import { Button, Image, View, Text, StyleSheet, ScrollView, FlatList, ActivityIndicator,} from 'react-native';
+import { Button, Image, View, Text, StyleSheet, ScrollView, FlatList, ActivityIndicator, Picker,} from 'react-native';
 import { createStackNavigator, createAppContainer, createBottomTabNavigator } from 'react-navigation'; // Version can be specified in package.json
 import { Icon } from 'react-native-elements';
-import { Font } from 'expo';
 
 const serverAddress = "18.222.24.171"
 const serverPort = "12547"
 
+class TitleScreen extends React.Component {
+
+   static navigationOptions = {
+    title: 'SmartParkU',
+   };
+   
+   constructor(props){
+    super(props);
+    this.state ={ 
+                  language: 'Home'
+                }
+    }
+
+   render() {
+   return(
+    <View style={styles.titleStyle}>
+     <Image style={styles.titleImage} source={require('./smartparku.png')} />
+     <Picker
+      selectedValue={this.state.language}
+      style={{height: 200, width: 400}}
+      onValueChange={(itemValue, itemIndex) =>
+         this.setState({language: itemValue})       
+      }>
+       <Picker.Item label="Montana State University" value='Home' />
+       <Picker.Item label="University of Montana" value='UoM' />
+      </Picker>
+      <Button
+          title="Go"
+          onPress={() => 
+            this.props.navigation.navigate(this.state.language)}
+        />
+    </View>
+    );
+  }
+}
+
+
 class HomeScreen extends React.Component {
   static navigationOptions = {
-    title: 'Home',
+    title: 'Lot Selection',
   };
+  
+  constructor(props){
+    super(props);
+    }
+  
   render() {
     return (
+    <View>
+      <Button
+          color = "red"
+          title="Campus Map"
+          onPress={() => this.props.navigation.navigate('Map')}
+        />
      <ScrollView style={{paddingTop: 10}}>
       <View> 
         <Button
@@ -130,22 +177,24 @@ class HomeScreen extends React.Component {
         />
       </View>
      </ScrollView>
+     </View>
     );
   }
 }
 
 class MapScreen extends React.Component {
-
+  constructor(props) {
+    super(props);
+  }
   render() {
     return (
       <ScrollView maximumZoomScale={2.5} minimumZoomScale={.38}
          contentContainerStyle={styles.scroll}>
       <Image style={styles.image} source={require('./parkingMap.png')} />
       </ScrollView>
-    );
-  }
+      );
+    }
 }
-
 
 class GreenHouseLot extends React.Component {
   static navigationOptions = {
@@ -175,7 +224,6 @@ class GreenHouseLot extends React.Component {
         }, function(){
 
         });        
-
       })
       .catch((error) =>{
         console.error(error);
@@ -183,8 +231,6 @@ class GreenHouseLot extends React.Component {
       
   this.ws.onopen = () => {
     this.ws.send(JSON.stringify(messageVar)); // send a message
-    
-  
   };
 
   this.ws.onmessage = (e) => {
@@ -209,8 +255,8 @@ class GreenHouseLot extends React.Component {
   };
   
   }
-  render () {
   
+  render () {
     if(this.state.isLoading){
       return(
         <View style={{flex: 1, padding: 20}}>
@@ -224,8 +270,7 @@ class GreenHouseLot extends React.Component {
         <Text style={styles.lotText}>Total Open: {this.state.dataSource.total}</Text>
         <Text></Text>
           <Image style={styles.lotImage} source={require('./GreenhouseLot.png')} />
-      </View>
-     
+      </View>     
     )
   }
 }
@@ -395,6 +440,16 @@ class LinhfieldLot extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  titleStyle: {
+   justifyContent: 'center',
+   alignItems: 'center',
+   paddingTop: 50,
+  },
+  titleImage: {
+    height: 200,
+    width:350,
+    resizeMode: 'contain',
+  },
   lotStyle: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -422,17 +477,19 @@ const styles = StyleSheet.create({
 
 const RootStack = createStackNavigator(
   {
+    Title: TitleScreen,
     Home: HomeScreen,
     Gatton: GattonLot,
     Linhfield: LinhfieldLot,
     GreenHouse: GreenHouseLot,
-    
+    Map: MapScreen,
   },
   {
-    initialRouteName: 'Home',
+    initialRouteName: 'Title',
   },
 );
 
+/*
 const TabNavigator = createBottomTabNavigator(
   {
     Home: { screen: RootStack, 
@@ -447,14 +504,20 @@ const TabNavigator = createBottomTabNavigator(
      },
   },
 );
+*/ 
 
-const AppContainer = createAppContainer(TabNavigator);
+const AppContainer = createAppContainer(RootStack);
 
 export default class App extends React.Component {
-  
+  constructor(props) {
+    super(props);
+    console.disableYellowBox = true;
+  }
   render() {
        return <AppContainer/>
   }
 }
+
+
 
 
