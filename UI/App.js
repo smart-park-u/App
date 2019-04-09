@@ -1,16 +1,13 @@
-/*
-South Gatton Lot
-West Linfield Lot
-GreenHouse Lot
-*/
 import React from 'react';
 import { Button, Image, View, Text, StyleSheet, ScrollView, FlatList, ActivityIndicator, Picker,} from 'react-native';
-import { createStackNavigator, createAppContainer, createBottomTabNavigator } from 'react-navigation'; // Version can be specified in package.json
+import { createStackNavigator, createAppContainer, createBottomTabNavigator } from 'react-navigation';
 import { Icon } from 'react-native-elements';
 
+//AWS server address and port
 const serverAddress = "18.222.24.171"
 const serverPort = "12547"
 
+//Title Screen component - Contains selector tool to pick a university.
 class TitleScreen extends React.Component {
 
    static navigationOptions = {
@@ -19,9 +16,7 @@ class TitleScreen extends React.Component {
    
    constructor(props){
     super(props);
-    this.state ={ 
-                  language: 'Home'
-                }
+    this.state ={language: 'Home'}              
     }
 
    render() {
@@ -47,7 +42,7 @@ class TitleScreen extends React.Component {
   }
 }
 
-
+//HomeScreen for each university(WIP) displays lot names as buttons
 class HomeScreen extends React.Component {
   static navigationOptions = {
     title: 'Lot Selection',
@@ -182,6 +177,7 @@ class HomeScreen extends React.Component {
   }
 }
 
+//MapScreen contains map for specific university (WIP)
 class MapScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -196,6 +192,13 @@ class MapScreen extends React.Component {
     }
 }
 
+/*  Greenhouse Lot at Montana state University. upon loading this component, the constructor
+ *  is called and a message is generated which will be sent to the server. A fetch is made
+ *  to obtain the current lot values in the database, which then updates the contents on
+ *  screen. The message Var is then sent off to the server and a websocket handshake is 
+ *  established. Once an update is sent from the server to the Lot, the number of spots
+ *  available is updated. 
+ */
 class GreenHouseLot extends React.Component {
   static navigationOptions = {
     title: 'Greenhouse Lot',
@@ -275,6 +278,13 @@ class GreenHouseLot extends React.Component {
   }
 }
 
+/*  Gatton Lot at Montana state University. upon loading this component, the constructor
+ *  is called and a message is generated which will be sent to the server. A fetch is made
+ *  to obtain the current lot values in the database, which then updates the contents on
+ *  screen. The message Var is then sent off to the server and a websocket handshake is 
+ *  established. Once an update is sent from the server to the Lot, the number of spots
+ *  available is updated. 
+ */
 class GattonLot extends React.Component {
   static navigationOptions = {
     title: 'South Gatton Lot',
@@ -357,6 +367,13 @@ class GattonLot extends React.Component {
   }
 }
 
+/*  Linhfield Lot at Montana state University. upon loading this component, the constructor
+ *  is called and a message is generated which will be sent to the server. A fetch is made
+ *  to obtain the current lot values in the database, which then updates the contents on
+ *  screen. The message Var is then sent off to the server and a websocket handshake is 
+ *  established. Once an update is sent from the server to the Lot, the number of spots
+ *  available is updated. 
+ */
 class LinhfieldLot extends React.Component {
   static navigationOptions = {
     title: 'West Linhfield Lot',
@@ -439,6 +456,7 @@ class LinhfieldLot extends React.Component {
   }
 }
 
+//Style sheets specific to particular contents within the app
 const styles = StyleSheet.create({
   titleStyle: {
    justifyContent: 'center',
@@ -475,6 +493,8 @@ const styles = StyleSheet.create({
   },
 });
 
+//Used for navigation. Enables a trace of visited components with the Title Screen at 
+//the root
 const RootStack = createStackNavigator(
   {
     Title: TitleScreen,
@@ -506,8 +526,11 @@ const TabNavigator = createBottomTabNavigator(
 );
 */ 
 
+// encapsulates the navigation root stack in an app container.
 const AppContainer = createAppContainer(RootStack);
 
+//disables possible warning messages and returns the AppContainer with the Title Screen 
+//at the root
 export default class App extends React.Component {
   constructor(props) {
     super(props);
