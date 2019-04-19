@@ -3,10 +3,12 @@ Purpose of this project is to display parking lot status via image recognition a
 	- Languages used: GO, JavaScript, and Bash
 	
 ## Front End
-The User Interface is written in React-Native(Javascript) and is run using the expo CLI. refer to the [Expo CLI Quickstart](https://facebook.github.io/react-native/docs/getting-started) to get an initial React-Native project started. Once the project has been created on your system, put all .png files and .js files, located in UI, in the root folder of the project. Replace default App.js with the App.js in the UI folder.
-```bash
+The User Interface is written in React-Native, a Javascript Framework and is run using the expo CLI. refer to the [Expo CLI Quickstart](https://facebook.github.io/react-native/docs/getting-started) to get an initial React-Native project started. Once the project has been created on your system you should have a folder with the name of the project with an App.js file in it. Put all .png files located in the UI folder above, in the root folder of the project (where App.js is). Next, in your shell navigate to to the newly created project folder and type
+```
 npm install --save react-navigation
 ```
+This will install the react-navigation dependency needed to run the application. Finally, replace default App.js with the App.js located in the UI folder above. When prompted to replace the file select yes/replace.
+
 ## Back End
 
 ### AWS Instance
