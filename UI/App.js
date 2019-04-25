@@ -1,13 +1,15 @@
 import React from 'react';
 import { Button, Image, View, Text, StyleSheet, ScrollView, FlatList, ActivityIndicator, Picker,} from 'react-native';
 import { createStackNavigator, createAppContainer, createBottomTabNavigator } from 'react-navigation';
-import { ButtonGroup} from 'react-native-elements'
 
 //AWS server address and port
 const serverAddress = "18.222.24.171"
 const serverPort = "12547"
 
-var lotName = ["Antelope", "GreenHouse", "Gatton", "Linhfield"]
+var lotName = ["Antelope Lot", "Bison Lot", "Deer Street Lot", "East Linhfield Lot", "Faculty Court", "GreenHouse", "Hamilton Lot", 
+               "Harrison Street Lot", "Huffman Lot", "Langford Lot", "Lewis and Clark Lot", "Lincoln Lot", "North Fieldhouse Lot", "North Hedges Lot", "Parking Garage",
+               "Quads Lot", "Roberts Lot", "Roskie Lot", "S. 7th Reserved Lot", "South Fieldhouse Lot", "Gatton", "South Hedges Lot", "South 12th Street Lot", "Stadium East Lot", 
+               "Linhfield", "West Stadium Lot", "Yellowstone Lot"]
 
 //Title Screen component - Contains selector tool to pick a university.
 class TitleScreen extends React.Component {
@@ -18,7 +20,7 @@ class TitleScreen extends React.Component {
    
    constructor(props){
     super(props);
-    this.state ={language: 'Home'}              
+    this.state ={selection: 'Home'}              
     }
 
    render() {
@@ -26,10 +28,10 @@ class TitleScreen extends React.Component {
     <View style={styles.titleStyle}>
      <Image style={styles.titleImage} source={require('./smartparku.png')} />
      <Picker
-      selectedValue={this.state.language}
+      selectedValue={this.state.selection}
       style={{height: 200, width: 400}}
       onValueChange={(itemValue, itemIndex) =>
-         this.setState({language: itemValue})       
+         this.setState({selection: itemValue})       
       }>
        <Picker.Item label="Montana State University" value='Home' />
        <Picker.Item label="University of Montana" value='UoM' />
@@ -37,7 +39,7 @@ class TitleScreen extends React.Component {
       <Button
           title="Go"
           onPress={() => 
-            this.props.navigation.navigate(this.state.language)}
+            this.props.navigation.navigate(this.state.selection)}
         />
     </View>
     );
@@ -46,175 +48,33 @@ class TitleScreen extends React.Component {
 
 //HomeScreen for each university(WIP) displays lot names as buttons
 class CampusHome extends React.Component {
-     constructor(props){
-       super(props);  
-       this.state = {
-          lots : ["GreenHouse","Linhfield","Gatton", "Antelope"]
-          }
-     }
-     /*
-     renderButtons = () => {
-
-     var views = this.state.lots.map((step,move) =>;
-     for ( var i =0; i < this.state.lots.length; i++){
-       var navName = this.state.lots[i]
-       var titleName = navName
-       if(navName=="GreenHouse") {
-         titleName = "Greenhouse Lot"
-       }
-       if(navName=="Linhfield") {
-         titleName = "West Linhfield Lot"
-       }
-       if(navName=="Gatton") {
-         titleName = "South Gatton Lot"
-       }
-       
-       views.push(
-       <Button
-         key = {i}
-         title = {titleName}
-         onPress = {(i) => this.props.navigation.navigate(navName)}
-         />
-        )
-        
-       } 
+     static navigationOptions = {
+       title: 'Lot Selection',
+     };
      
-      return views;
-     }
-     */
-  static navigationOptions = {
-    title: 'Lot Selection',
-  };
-  
-  
-    
-  render() {
-    
+     renderButtons = () => {
+       title = ''
+	   const views = lotName.map(x =>  
+	   <Button
+	     title = { (x == "GreenHouse") ? "Greenhouse Lot" : (x == "Linhfield") ? "West Linhfield Lot" : (x == "Gatton") ? "South Gatton Lot" : x}
+	     onPress = {() => this.props.navigation.navigate(x)}
+	   />
+	   );
+	   views.unshift(
+	   <Button
+	     color = "red"
+	     title = "Campus Map"
+	     onPress = {() => this.props.navigation.navigate('Map')}
+	   />
+	   );
+	 return views;
+	 }
+	 
+  render() { 
     return (
-    /*
      <ScrollView styles={{resizeMode: 'contain'}}>  
       {this.renderButtons()}
      </ScrollView>
-    */
-    
-    <View styles={{resizeMode: 'contain'}}>
-       <Button
-          color = "red"
-          title="Campus Map"
-          onPress={() => this.props.navigation.navigate('Map')}
-        />
-     <ScrollView styles={{resizeMode: 'contain'}}>
-        <Button
-          title="Antelope Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="Bison lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="Deer Street Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="East Linhfield Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="Faculty Court"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="Greenhouse Lot"
-          onPress={() => this.props.navigation.navigate('GreenHouse')}
-        />
-        <Button
-          title="Hamilton Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="Harrison Street Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="Huffman Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="Langford Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="Lewis and Clark Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-           <Button
-          title="Lincoln Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="North Fieldhouse Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="North Hedges Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="Parking Garage"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="Quads Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="Roberts Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="Roskie Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="S. 7th Reserved Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="South Fieldhouse Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="South Gatton Lot"
-          onPress={() => this.props.navigation.navigate('Gatton')}
-        />
-         <Button
-          title="South Hedges Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="South 12th Street Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="Stadium East Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="West Stadium Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-        <Button
-          title="West Linhfield Lot"
-          onPress={() => this.props.navigation.navigate('Linhfield')}
-        />
-        <Button
-          title="Yellowstone Lot"
-          onPress={() => this.props.navigation.navigate('')}
-        />
-     </ScrollView>
-     </View>
-     
     );   
   }
 }
@@ -330,7 +190,7 @@ class GattonLot extends React.Component {
     super(props);
     messageVar = {
               content: 'subscribe',
-              topic: 'gatton'
+              topic: 'south-gatton'
     }
     
     this.state ={ isLoading: true,
@@ -556,6 +416,4 @@ export default class App extends React.Component {
        return <AppContainer/>
   }
 }
-
-
 
